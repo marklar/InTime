@@ -1,13 +1,16 @@
-{-# LANGUAGE DataKinds #-}           -- to use TypeLits (e.g. 0, 1) in type sig
-{-# LANGUAGE KindSignatures #-}      -- to allow kinds (e.g. Type, Nat) in sig of GADT
-{-# LANGUAGE TypeOperators #-}       -- to use (>), (+), etc. in type sig
+{-# LANGUAGE DataKinds #-}              -- for: TypeLits (e.g. 0, 1) in type sig
+{-# LANGUAGE FlexibleInstances #-}      -- for: instance Wait n InTime
+{-# LANGUAGE KindSignatures #-}         -- for: kinds (e.g. Type, Nat) in sig of GADT
+{-# LANGUAGE MultiParamTypeClasses #-}  -- for: class Wait n c where
+{-# LANGUAGE TypeOperators #-}          -- for: (>), (+), etc. in type sig
 {-# LANGUAGE UnicodeSyntax #-}
 
-{-|
+-- Without this, "Couldn't match type ‘2 + n’ with ‘n + 2’"
+{-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
 
+{-|
 Data ctor for InTime isn't exported.
 (Clients must use `tReturn` instead.)
-
 -}
 module InTime where
   -- ( InTime
@@ -19,6 +22,7 @@ module InTime where
   -- ) where
 
 
+import Data.Proxy
 import GHC.TypeLits
 -- import Constraints
 
@@ -43,7 +47,8 @@ tForce ∷ InTime n α → α
 tForce (IT x) = x
 
 
-------
+-------------------
+-- steps
 
 tStep ∷ InTime n α → InTime (n + 1) α
 tStep (IT x) = IT x
@@ -52,3 +57,30 @@ tStep (IT x) = IT x
 -- ~ "tStep . tReturn"
 tStepRet ∷ α → InTime 1 α
 tStepRet x = IT x
+
+
+-------------------
+-- multiple steps
+
+step2 ∷ InTime n α → InTime (n+2) α
+step2 (IT x) = IT x
+
+
+step3 ∷ InTime n α → InTime (n+3) α
+step3 (IT x) = IT x
+
+
+---------------------------
+-- arbitrarily many steps
+
+-- This doesn't work: "Expected a type, but 'm' has kind 'Nat'"
+-- stepN ∷ (m ∷ Nat) → InTime n α → InTime (m+n) α
+-- stepN _ (IT x) = IT x
+
+
+class Step n c where
+  stepN ∷ Proxy n → c m α → c (n+m) α
+
+
+instance Step n InTime where
+  stepN _ (IT x) = IT x

@@ -1,11 +1,13 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UnicodeSyntax #-}
-
 
 import Test.Hspec
 import Vec
 import InTime
 import VecTime
+import Data.Proxy
+
 
 (≡≡) ∷ (Eq α, Show α) ⇒ α → α → IO ()
 (≡≡) = shouldBe
@@ -14,6 +16,13 @@ infixr 1 ≡≡
 main :: IO ()
 main =
   hspec $ do
+
+  describe "InTime.stepN" $ do
+    let v0 = 1 :# 2 :# Nil ∷ Vec 2 Int in
+      it "adds N to complexity" $ do
+        stepN (Proxy ∷ Proxy 10) (tReturn v0) ≡≡ (IT v0 ∷ InTime 10 (Vec 2 Int))
+        step2 (tReturn v0) ≡≡ (IT v0 ∷ InTime 2 (Vec 2 Int))
+        step3 (tReturn v0) ≡≡ (IT v0 ∷ InTime 3 (Vec 2 Int))
 
   -- VecTime
   describe "VecTime.vtAppend" $ do
