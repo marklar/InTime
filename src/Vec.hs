@@ -1,7 +1,6 @@
-{-# LANGUAGE ConstraintKinds #-}     -- CmpNat x y ~ 'GT
 {-# LANGUAGE DataKinds #-}           -- to use TypeLits in type sig
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE KindSignatures #-}      -- to allow kinds (e.g. Type) in sig of GADT
+{-# LANGUAGE KindSignatures #-}      -- to allow kinds (e.g. Type, Nat) in sig of GADT
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TypeOperators #-}       -- to use (>), (+), etc. in type sig
 {-# LANGUAGE UnicodeSyntax #-}
@@ -14,10 +13,7 @@ module Vec where
 
 import Data.Kind
 import GHC.TypeLits
-
--- This are Constraints. (e.g. `n < 1` or `1 > n`)
-type x > y = CmpNat x y ~ 'GT
-type x < y = CmpNat x y ~ 'LT
+import Constraints
 
 
 infixr 5 :#
