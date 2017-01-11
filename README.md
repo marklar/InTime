@@ -15,6 +15,20 @@ the data structures upon which the algorithm acts, reflecting the
 number of steps required (thus far) to create them.
 
 
+## Questions
+
+There are a number of questions about how best to implement this
+library. They include:
+
++ How to indicate the "steps"?
++ Instance of `Monad`?
++ How to indicate Big-O (rather than step-for-step) complexity?
++ Lazy vs. eager evaluation?
++ How to compute logarithms at the type level?
+
+
+only 2 things: the constant & loops
+
 ## How to indicate what the "steps" are?
 
 When analyzing the time complexity of algorithms, one wishes to

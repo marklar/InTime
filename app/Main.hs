@@ -1,6 +1,7 @@
 module Main where
 
-import Lib
+import Vec
 
 main :: IO ()
-main = undefined
+main =
+  print $ (1 :# 2 :# Nil) +# (11 :# 12 :# Nil)

@@ -15,8 +15,9 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Lib
+  exposed-modules:     Vec
   build-depends:       base >= 4.7 && < 5
+                     , ghc-typelits-natnormalise
   default-language:    Haskell2010
 
 executable InTime-exe
@@ -33,6 +34,7 @@ test-suite InTime-test
   main-is:             Spec.hs
   build-depends:       base
                      , InTime
+                     , hspec
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
 
