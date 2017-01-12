@@ -44,7 +44,7 @@ tReturn = IT
 
 
 tReturn1 ∷ α → InTime 1 α
-tReturn1 x = IT x
+tReturn1 = IT
 
 
 tReturnN ∷ Proxy n → α → InTime n α
