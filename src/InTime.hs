@@ -87,5 +87,10 @@ class Step n c where
   stepN ∷ Proxy n → c m α → c (n+m) α
 
 
+{-| Example usage:
+  $ let v0 = 1 :# 2 :# Nil ∷ Vec 2 Int
+  $ :t stepN (Proxy ∷ Proxy 10) (tReturn v0)
+  > … ∷ (IT v0 ∷ InTime 10 (Vec 2 Int))
+-}
 instance Step n InTime where
   stepN _ (IT x) = IT x

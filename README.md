@@ -26,8 +26,30 @@ library. They include:
 + Lazy vs. eager evaluation?
 + How to compute logarithms at the type level?
 
-
 only 2 things: the constant & loops
+
+
+## Expressing time complexity of indeterminate # of steps
+
+Consider the case of `insert` - inserting a value into a sorted Vec
+such that the result is also sorted. The number of steps depends on
+the value of the to-be-inserted value as well as the values in the
+Vec. It may take only a single step, or it may take as many as there
+are elements in the Vec.
+
+How do we express this in the types? We'd like to be able to write
+something like this:
+
+```haskell
+insert ∷ α → Vec n α → InTime s (Vec (n+1) α)
+```
+
+Where `s` is some Nat between 1 and `(n+1)` (or perhaps `(2*n+1)`).
+
+In the [blog post](http://twanvl.nl/blog/agda/sorting), the author
+wishes to "reason about the runtime, as measured in the number of
+comparisons performed".
+
 
 ## How to indicate what the "steps" are?
 

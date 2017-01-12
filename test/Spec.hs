@@ -7,6 +7,7 @@ import Vec
 import InTime
 import VecTime
 import Data.Proxy
+import GHC.TypeLits
 
 
 (≡≡) ∷ (Eq α, Show α) ⇒ α → α → IO ()
@@ -25,6 +26,15 @@ main =
         in
         v0 +++ v1 ≡≡ (IT (1 :# 2 :# 11 :# 12 :# Nil) ∷ InTime 5 (Vec 4 Int))
         -- v0 +++ v1 ≡≡ (IT (1 :# 2 :# 11 :# 12 :# Nil) ∷ (ν ~ (Vec 4 Int)) ⇒ InTime 5 ν)
+
+  describe "VecTime.vtInsert" $ do
+      it "inserts into Nil vec" $ do
+        2 +$+ Nil ≡≡ (IT (2 :# Nil) ∷ InTime 1 (Vec 1 Int))
+      let v0 = 1 :# 2 :# Nil ∷ Vec 2 Int in
+        it "inserts into vec w/ same complexity, regardless of where" $ do
+          0 +$+ v0 ≡≡ (IT (0 :# 1 :# 2 :# Nil) ∷ InTime 3 (Vec 3 Int))
+          1 +$+ v0 ≡≡ (IT (1 :# 1 :# 2 :# Nil) ∷ InTime 3 (Vec 3 Int))
+          2 +$+ v0 ≡≡ (IT (1 :# 2 :# 2 :# Nil) ∷ InTime 3 (Vec 3 Int))
 
   -- InTime
   describe "InTime.stepN" $ do
@@ -45,6 +55,19 @@ main =
       tForce (tReturn 3.7) ≡≡ 3.7
 
   -- Vec
+  {-
+  describe "Vec.natIntegerAsSomeNat" $ do
+    it "returns a SomeNat" $ do
+      natIntegerAsSomeNat 3 ≡≡ SomeNat (Proxy ∷ Proxy 3)
+  -}
+
+  describe "Vec.vlen" $ do
+    let v0 = 1 :# 2 :# Nil ∷ Vec 2 Int in
+      it "finds length as Integer" $ do
+        vlen Nil ≡≡ 0
+        vlen v0 ≡≡ 2
+        vlen (v0 +# v0) ≡≡ 4
+
   describe "Vec.vhead" $ do
     -- NB: doesn't type-check: `vhead Nil`
     it "returns the head of a non-nil Vec" $ do
