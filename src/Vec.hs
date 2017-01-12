@@ -65,6 +65,7 @@ insert x (y :# ys)
   | otherwise = y :# (insert x ys)
 
 
+-- Make instance of Foldable, and implement w/ fold.
 inSort ∷ (Ord α) ⇒ Vec n α → Vec n α
 inSort Nil       = Nil
 inSort (x :# xs) = insert x (inSort xs)

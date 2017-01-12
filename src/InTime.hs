@@ -43,6 +43,14 @@ tReturn ∷ α → InTime 0 α
 tReturn = IT
 
 
+tReturn1 ∷ α → InTime 1 α
+tReturn1 x = IT x
+
+
+tReturnN ∷ Proxy n → α → InTime n α
+tReturnN _ = IT
+
+
 -- look for dual of Monad
 tForce ∷ InTime n α → α
 tForce (IT x) = x
@@ -51,40 +59,8 @@ tForce (IT x) = x
 -------------------
 -- steps
 
-tStep ∷ InTime n α → InTime (n + 1) α
-tStep (IT x) = IT x
-
-
--- ~ "tStep . tReturn"
-tStepRet ∷ α → InTime 1 α
-tStepRet x = IT x
-
-
--------------------
--- multiple steps
-
-step2 ∷ InTime n α → InTime (n+2) α
-step2 (IT x) = IT x
-
-
-step3 ∷ InTime n α → InTime (n+3) α
-step3 (IT x) = IT x
-
-
----------------------------
--- arbitrarily many steps
-
-{-
--- This doesn't work: "Expected a type, but 'm' has kind 'Nat'"
-stepN ∷ (m ∷ Nat) → InTime n α → InTime (m+n) α
-stepN _ (IT x) = IT x
--}
-
-{-| One-off typeclass. `Proxy` allows us to reflect a term-level value
-  into the type level.
--}
-class Step n c where
-  stepN ∷ Proxy n → c m α → c (n+m) α
+tStep1 ∷ InTime n α → InTime (n + 1) α
+tStep1 (IT x) = IT x
 
 
 {-| Example usage:
@@ -92,5 +68,5 @@ class Step n c where
   $ :t stepN (Proxy ∷ Proxy 10) (tReturn v0)
   > … ∷ (IT v0 ∷ InTime 10 (Vec 2 Int))
 -}
-instance Step n InTime where
-  stepN _ (IT x) = IT x
+tStepN ∷ Proxy m → InTime n α → InTime (m+n) α
+tStepN _ (IT x) = IT x

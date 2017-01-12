@@ -37,17 +37,31 @@ main =
           3 +$+ v0 ≡≡ (IT (1 :# 2 :# 3 :# Nil) ∷ InTime 3 (Vec 3 Int))
 
   -- InTime
-  describe "InTime.stepN" $ do
+  describe "InTime.tStep1" $ do
     let v0 = 1 :# 2 :# Nil ∷ Vec 2 Int in
       it "adds N to complexity" $ do
-        stepN (Proxy ∷ Proxy 10) (tReturn v0) ≡≡ (IT v0 ∷ InTime 10 (Vec 2 Int))
-        step2 (tReturn v0) ≡≡ (IT v0 ∷ InTime 2 (Vec 2 Int))
-        step3 (tReturn v0) ≡≡ (IT v0 ∷ InTime 3 (Vec 2 Int))
+        tStep1 (tReturn v0) ≡≡ (IT v0 ∷ InTime 1 (Vec 2 Int))
+
+  describe "InTime.tStepN" $ do
+    let v0 = 1 :# 2 :# Nil ∷ Vec 2 Int in
+      it "adds N to complexity" $ do
+        tStepN (Proxy ∷ Proxy 1) (tReturn v0) ≡≡ (IT v0 ∷ InTime 1 (Vec 2 Int))
+        tStepN (Proxy ∷ Proxy 3) (tReturn v0) ≡≡ (IT v0 ∷ InTime 3 (Vec 2 Int))
+
+  describe "InTime.tReturn1" $ do
+    let v0 = 1 :# 2 :# Nil ∷ Vec 2 Int in
+      it "wraps w/ complexity of 1" $ do
+        tReturn1 v0 ≡≡ (IT v0 ∷ InTime 1 (Vec 2 Int))
 
   describe "InTime.tReturn" $ do
-    it "returns a singleton" $ do
+    it "returns wrapped w/ 0 steps" $ do
       tReturn 'a' ≡≡ (IT 'a' ∷ InTime 0 Char)
       tReturn 3.7 ≡≡ (IT 3.7 ∷ InTime 0 Double)
+
+  describe "InTime.tReturnN" $ do
+    it "returns wrapped w/ N steps" $ do
+      tReturnN (Proxy ∷ Proxy 3) 'a' ≡≡ (IT 'a' ∷ InTime 3 Char)
+      tReturnN (Proxy ∷ Proxy 8) 3.7 ≡≡ (IT 3.7 ∷ InTime 8 Double)
 
   describe "InTime.tForce" $ do
     it "extracts α from container" $ do
