@@ -65,12 +65,9 @@ insert x (y :# ys)
   | otherwise = y :# (insert x ys)
 
 
--- (n ^ 2 + n) + (n + 1) ≡ (1 + n) ^ 2
--- (n+1) * (n+1)  =  n² + n + n + 1  =  n² + 2*n + 1
-
-insertionSort ∷ (Ord α) ⇒ Vec n α → Vec n α
-insertionSort Nil       = Nil
-insertionSort (x :# xs) = insert x (insertionSort xs)
+inSort ∷ (Ord α) ⇒ Vec n α → Vec n α
+inSort Nil       = Nil
+inSort (x :# xs) = insert x (inSort xs)
 
 
 instance Functor (Vec n) where

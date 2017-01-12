@@ -28,6 +28,11 @@ so we know it's non-negative (and thus isomorphic to a Nat).
 natIntegerAsSomeNat ∷ Integer → SomeNat
 natIntegerAsSomeNat x =
   fromMaybe (SomeNat (Proxy ∷ Proxy 0)) (someNatVal x)
+
+  -- spec
+  describe "Constraint.natIntegerAsSomeNat" $ do
+    it "returns a SomeNat" $ do
+      natIntegerAsSomeNat 3 ≡≡ SomeNat (Proxy ∷ Proxy 3)
 -}
 
 

@@ -25,7 +25,6 @@ main =
           v1 = 11 :# 12 :# Nil ∷ Vec 2 Int
         in
         v0 +++ v1 ≡≡ (IT (1 :# 2 :# 11 :# 12 :# Nil) ∷ InTime 5 (Vec 4 Int))
-        -- v0 +++ v1 ≡≡ (IT (1 :# 2 :# 11 :# 12 :# Nil) ∷ (ν ~ (Vec 4 Int)) ⇒ InTime 5 ν)
 
   describe "VecTime.vtInsert" $ do
       it "inserts into Nil vec" $ do
@@ -35,6 +34,7 @@ main =
           0 +$+ v0 ≡≡ (IT (0 :# 1 :# 2 :# Nil) ∷ InTime 3 (Vec 3 Int))
           1 +$+ v0 ≡≡ (IT (1 :# 1 :# 2 :# Nil) ∷ InTime 3 (Vec 3 Int))
           2 +$+ v0 ≡≡ (IT (1 :# 2 :# 2 :# Nil) ∷ InTime 3 (Vec 3 Int))
+          3 +$+ v0 ≡≡ (IT (1 :# 2 :# 3 :# Nil) ∷ InTime 3 (Vec 3 Int))
 
   -- InTime
   describe "InTime.stepN" $ do
@@ -53,13 +53,6 @@ main =
     it "extracts α from container" $ do
       tForce (tReturn 'a') ≡≡ 'a'
       tForce (tReturn 3.7) ≡≡ 3.7
-
-  -- Vec
-  {-
-  describe "Vec.natIntegerAsSomeNat" $ do
-    it "returns a SomeNat" $ do
-      natIntegerAsSomeNat 3 ≡≡ SomeNat (Proxy ∷ Proxy 3)
-  -}
 
   describe "Vec.vlen" $ do
     let v0 = 1 :# 2 :# Nil ∷ Vec 2 Int in
@@ -101,6 +94,11 @@ main =
       insert 3 (1 :# 2 :# Nil) ≡≡ 1 :# 2 :# 3 :# Nil
     it "includes both vals if EQ" $ do
       insert 2 (1 :# 2 :# Nil) ≡≡ 1 :# 2 :# 2 :# Nil
+
+  describe "Vec.inSort" $ do
+    it "sorts lists, keeps size" $ do
+      inSort (Nil ∷ Vec 0 Int) ≡≡ Nil
+      inSort (3 :# 1 :# 2 :# Nil) ≡≡ 1 :# 2 :# 3 :# Nil
 
   describe "Vec functor instance" $ do
     it "can be mapped over" $ do
