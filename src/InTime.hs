@@ -43,6 +43,7 @@ tReturn ∷ α → InTime 0 α
 tReturn = IT
 
 
+-- look for dual of Monad
 tForce ∷ InTime n α → α
 tForce (IT x) = x
 
@@ -73,11 +74,15 @@ step3 (IT x) = IT x
 ---------------------------
 -- arbitrarily many steps
 
+{-
 -- This doesn't work: "Expected a type, but 'm' has kind 'Nat'"
--- stepN ∷ (m ∷ Nat) → InTime n α → InTime (m+n) α
--- stepN _ (IT x) = IT x
+stepN ∷ (m ∷ Nat) → InTime n α → InTime (m+n) α
+stepN _ (IT x) = IT x
+-}
 
-
+{-| One-off typeclass. `Proxy` allows us to reflect a term-level value
+  into the type level.
+-}
 class Step n c where
   stepN ∷ Proxy n → c m α → c (n+m) α
 

@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}           -- to use TypeLits in type sig
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE KindSignatures #-}      -- to allow kinds (e.g. Type, Nat) in sig of GADT
 {-# LANGUAGE StandaloneDeriving #-}
@@ -12,12 +13,19 @@
 module Vec where
 
 import Data.Kind
+import Data.Proxy
 import GHC.TypeLits
+
 import Constraints
 
 
 infixr 5 :#
 
+{-| Different semantics?
+  data Vec (n ∷ Nat) (α ∷ Type) ∷ Type where
+  data Vec (n ∷ Nat) ∷ Type → Type where
+  data Vec ∷ Nat → Type → Type where
+-}
 data Vec ∷ Nat → Type → Type where
   Nil  ∷ Vec 0 α
   (:#) ∷ α → Vec n α → Vec (n + 1) α
@@ -40,7 +48,10 @@ vtail (_ :# xs) = xs
 (+#) (x :# xs) ys = x :# (xs +# ys)
 
 
--- Assumes ys is sorted.
+{-| Assumes: ys is sorted. (Or more generally, it inserts an element
+into the Vec in such a way that if the input is sorted the output will
+also be sorted.
+-}
 insert ∷ (Ord α) ⇒ α → Vec n α → Vec (n + 1) α
 insert x Nil = x :# Nil
 insert x (y :# ys)
@@ -51,3 +62,14 @@ insert x (y :# ys)
 instance Functor (Vec n) where
   fmap _ Nil       = Nil
   fmap f (x :# xs) = (f x) :# fmap f xs
+
+
+{-
+-- Type-level fn for length of Vec. Unneeded.
+
+class Length (n ∷ Nat) where
+  vLen ∷ Vec n α → Proxy n
+
+instance Length n where
+  vLen xs = Proxy
+-}

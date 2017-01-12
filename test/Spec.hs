@@ -17,13 +17,6 @@ main :: IO ()
 main =
   hspec $ do
 
-  describe "InTime.stepN" $ do
-    let v0 = 1 :# 2 :# Nil ∷ Vec 2 Int in
-      it "adds N to complexity" $ do
-        stepN (Proxy ∷ Proxy 10) (tReturn v0) ≡≡ (IT v0 ∷ InTime 10 (Vec 2 Int))
-        step2 (tReturn v0) ≡≡ (IT v0 ∷ InTime 2 (Vec 2 Int))
-        step3 (tReturn v0) ≡≡ (IT v0 ∷ InTime 3 (Vec 2 Int))
-
   -- VecTime
   describe "VecTime.vtAppend" $ do
     it "appends two vecs" $ do
@@ -31,8 +24,16 @@ main =
           v1 = 11 :# 12 :# Nil ∷ Vec 2 Int
         in
         v0 +++ v1 ≡≡ (IT (1 :# 2 :# 11 :# 12 :# Nil) ∷ InTime 5 (Vec 4 Int))
+        -- v0 +++ v1 ≡≡ (IT (1 :# 2 :# 11 :# 12 :# Nil) ∷ (ν ~ (Vec 4 Int)) ⇒ InTime 5 ν)
 
   -- InTime
+  describe "InTime.stepN" $ do
+    let v0 = 1 :# 2 :# Nil ∷ Vec 2 Int in
+      it "adds N to complexity" $ do
+        stepN (Proxy ∷ Proxy 10) (tReturn v0) ≡≡ (IT v0 ∷ InTime 10 (Vec 2 Int))
+        step2 (tReturn v0) ≡≡ (IT v0 ∷ InTime 2 (Vec 2 Int))
+        step3 (tReturn v0) ≡≡ (IT v0 ∷ InTime 3 (Vec 2 Int))
+
   describe "InTime.tReturn" $ do
     it "returns a singleton" $ do
       tReturn 'a' ≡≡ (IT 'a' ∷ InTime 0 Char)

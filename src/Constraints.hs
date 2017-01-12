@@ -12,3 +12,5 @@ import GHC.TypeLits
 -- This are Constraints. (e.g. `n < 1` or `1 > n`)
 type x > y = CmpNat x y ~ 'GT
 type x < y = CmpNat x y ~ 'LT
+
+-- type Foo x y = (x > y, x < y)
