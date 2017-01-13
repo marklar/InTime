@@ -24,7 +24,6 @@ module InTime where
 
 import Data.Proxy
 import GHC.TypeLits
--- import Constraints
 
 
 data InTime (n ∷ Nat) α = IT α

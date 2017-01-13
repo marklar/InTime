@@ -11,10 +11,11 @@ import Data.Proxy
 
 main ∷ IO ()
 main = do
-  print $ v0 +# v1
-  print . tForce $ v0 +++ v1
+  -- print $ v0 +# v1
+  -- print . tForce $ v0 +++ v1
 
   print (tStepN (Proxy ∷ Proxy 10) (tReturn v1) ∷ InTime 10 (Vec 2 Int))
+  -- print (tStepN (Algun ∷ Algun 10) (tReturn v1) ∷ InTime 10 (Vec 2 Int))
 
   where
     v0 = 1  :# 2  :# Nil
