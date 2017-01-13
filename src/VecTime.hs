@@ -1,12 +1,19 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleInstances #-}      -- for: instance VTInsertable 1 0 where
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE IncoherentInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}  -- for: class Insertable s n where
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE UnicodeSyntax #-}
 
--- {-# LANGUAGE FlexibleInstances #-}      -- for: instance VTInsertable 1 0 where
+-- ??
+{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE KindSignatures #-}
+
 
 -- Without this, "Could not deduce: ((n1 + n) + 1) ~ (m + n)"
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
@@ -15,6 +22,7 @@
 module VecTime where
 
 import GHC.TypeLits
+import Data.Kind hiding (type (*))
 import Data.Proxy
 
 import InTime
@@ -25,26 +33,23 @@ import Constraints
 
 -- Need to do this with a typeclass?
 
-{-
 vtAppend = (+++)
 infixr 5 +++
 
-(+++) ∷ (KnownNat m, KnownNat m, KnownNat (m+n)) => Vec m α → Vec n α → InTime (1 + 2*m) (Vec (m+n) α)
+(+++) ∷ Vec m α → Vec n α → InTime (1 + 2*m) (Vec (m+n) α)
 (+++) Nil       ys = tReturn1 ys
 (+++) (x :# xs) ys = tStep1 $ (xs +++ ys) `tBind` \xsys → tReturn1 $ x :# xsys
--}
 
 -----
 
 -- (◂)
-vtInsert ∷ (KnownNat n, Ord α) ⇒ α → Vec n α → InTime (n+1) (Vec (n+1) α)
+vtInsert ∷ (Ord α) ⇒ α → Vec n α → InTime (n+1) (Vec (n+1) α)
 vtInsert = (+$+)
 infixr 5 +$+
 
 -- ^ We use tReturnN to declare the number of steps it MIGHT be.
 -- http://stackoverflow.com/questions/40731220/couldnt-match-kind-with-nat
--- (+$+) ∷ ∀ n α. (KnownNat n, KnownNat (n-1), Ord α)
-(+$+) ∷ ∀ n α. (KnownNat n, Ord α)
+(+$+) ∷ ∀ n α. (Ord α)
       ⇒ α → Vec n α → InTime (n+1) (Vec (n+1) α)
 
 (+$+) x Nil =
@@ -57,46 +62,47 @@ infixr 5 +$+
       tStep1 $ (x +$+ ys') `tBind` \xys' → tReturn $ y :# xys'
 
 
-{-
-(n ^ 2 + n) + (n + 1) ≡ (1 + n) ^ 2
-(n+1) * (n+1)  =  n² + n + n + 1  =  n² + 2*n + 1
+{-| Similar to Fibonacci series.
+n : s  i  total
+---------------
+0 : 0  -  0
+1 : 0  1  1
+2 : 1  2  3
+3 : 3  3  6
+4 : 6  4  10
+5 : 10 5  15
+6 : 15 6  21
 -}
 
--- vtInSort ∷ (Ord α) ⇒ Vec n α → InTime (n^2 - n + 1) (Vec n α)
--- vtInSort ∷ (Ord α) ⇒ Vec n α → InTime (n^2 + n) (Vec n α)
--- vtInSort Nil = tReturn Nil
--- vtInSort (x :# xs) =
--- vtInSort xs `tBind` vtInsert x `tBind` tReturn
+type family InSortSteps (n ∷ Nat) where
+  InSortSteps 0 = 0
+  InSortSteps n = n + InSortSteps (n-1)
 
--- type family 
+{-
+vtInSort ∷ (Ord α) ⇒ Vec n α → InTime (InSortSteps n) (Vec n α)
+vtInSort Nil = tReturn Nil
+vtInSort (x :# xs) =
+  vtInSort xs `tBind` vtInsert x `tBind` tReturn
+-}
 
-xyz ∷ Int → Int
-xyz 0 = 0
-xyz i = (prevI * (xyz prevI)) + i
-  where prevI = i-1
+{-
+class InSortable n where
+  vtInSort ∷ Vec n α → InTime (InSortSteps n) (Vec n α)
 
--- i r
--- ----
--- 0 0
--- 1 1
--- 2 3
--- 3 6
--- 4 10
--- 5 15
--- 6 21
+instance InSortable 0 where
+  vtInSort Nil = tReturn Nil
 
--- 0 0
--- 1 0
--- 2 1
--- 3 3
--- 4 6
--- 5 10
--- 6 15
+instance (n > 0, InSortable (n-1)) ⇒ InSortable n where
+  vtInSort (x :# xs) = vtInSort xs `tBind` vtInsert x `tBind` tReturn
+-}
 
--- n ≡ 6, steps: 15 + 6 + 0 = 21
--- n ≡ 5, steps: 10 + 5 + 0 = 15
--- n ≡ 4, steps: 6  + 4 + 0 = 10
--- n ≡ 3, steps: 3  + 3 + 0 = 6
--- n ≡ 2, steps: 1  + 2 + 0 = 3
--- n ≡ 1, steps: 0  + 1 + 0 = 1
--- n ≡ 0, steps: 0 = 0
+{-
+class InSortable v where
+  vtInSort ∷ (KnownNat n) ⇒ v α → InTime (InSortSteps n) (v α)
+
+instance InSortable (Vec 0) where
+  vtInSort Nil = tReturn Nil
+
+instance (n > 0, InSortable (Vec (n-1))) ⇒ InSortable (Vec n) where
+  vtInSort (x :# xs) = vtInSort xs `tBind` vtInsert x `tBind` tReturn
+-}
